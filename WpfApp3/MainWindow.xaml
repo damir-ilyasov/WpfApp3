@@ -1,0 +1,160 @@
+﻿<Window x:Class="WpfApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="HTTP Монитор" Height="700" Width="950"
+        Closing="Window_Closing">
+
+    <Grid Margin="10">
+        <TabControl>
+
+            <TabItem Header="Сервер">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Grid.Row="0" Header="Управление сервером" Margin="0,0,0,10">
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="Порт:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox x:Name="TxtPort" Width="80" Text="8080" Margin="0,0,10,0"/>
+                            <Button x:Name="BtnStartStop" Content="Запустить сервер"
+                                    Width="140" Click="BtnStartStop_Click" Margin="0,0,10,0"/>
+                            <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="TxtServerStatus" Text="Остановлен"
+                                        VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="1" Header="Статистика" Margin="0,0,0,10">
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="GET запросов:" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="TxtGetCount" Text="0" FontWeight="Bold" Margin="0,0,20,0"/>
+                            <TextBlock Text="POST запросов:" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="TxtPostCount" Text="0" FontWeight="Bold" Margin="0,0,20,0"/>
+                            <TextBlock Text="Среднее время:" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="TxtAvgTime" Text="0 мс" FontWeight="Bold" Margin="0,0,20,0"/>
+                            <TextBlock Text="Время работы:" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="TxtUptime" Text="—" FontWeight="Bold"/>
+                            <TextBlock Text="Нагрузка / мин:" Margin="20,0,5,0"/>
+                            <TextBlock x:Name="TxtLoadMinute" Text="0" FontWeight="Bold"/>
+
+                            <TextBlock Text="Нагрузка / час:" Margin="20,0,5,0"/>
+                            <TextBlock x:Name="TxtLoadHour" Text="0" FontWeight="Bold"/>
+
+                            <TextBlock Text="Пик / мин:" Margin="20,0,5,0"/>
+                            <TextBlock x:Name="TxtPeakMinute" Text="0" FontWeight="Bold"/>
+
+                            <TextBlock Text="Пик / час:" Margin="20,0,5,0"/>
+                            <TextBlock x:Name="TxtPeakHour" Text="0" FontWeight="Bold"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Header="Логи входящих запросов">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Фильтр:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <ComboBox x:Name="CmbServerFilter" Width="100"
+                                          SelectionChanged="CmbServerFilter_SelectionChanged">
+                                    <ComboBoxItem Content="Все" IsSelected="True"/>
+                                    <ComboBoxItem Content="GET"/>
+                                    <ComboBoxItem Content="POST"/>
+                                </ComboBox>
+                                <Button Content="Очистить" Margin="10,0,0,0"
+                                        Click="ClearServerLog_Click"/>
+                                <Button Content="Сохранить в файл" Margin="5,0,0,0"
+                                        Click="SaveLog_Click"/>
+                            </StackPanel>
+                            <TextBox Grid.Row="1" x:Name="TxtServerLog"
+                                     IsReadOnly="True" TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     FontFamily="Consolas" FontSize="11"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Клиент">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Grid.Row="0" Header="Отправка запроса" Margin="0,0,0,10">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="URL:"
+                                       VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" x:Name="TxtClientUrl"
+                                     Text="https://jsonplaceholder.typicode.com/posts"
+                                     Margin="0,3,0,5"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Метод:"
+                                       VerticalAlignment="Center"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbMethod"
+                                      Width="100" HorizontalAlignment="Left"
+                                      Margin="0,3,0,5"
+                                      SelectionChanged="CmbMethod_SelectionChanged">
+                                <ComboBoxItem Content="GET" IsSelected="True"/>
+                                <ComboBoxItem Content="POST"/>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Тело (JSON):"
+                                       VerticalAlignment="Top" Margin="0,3,0,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" x:Name="TxtRequestBody"
+                                     Height="60" TextWrapping="Wrap"
+                                     Text="{}{&quot;message&quot;: &quot;Привет, сервер!&quot;}"
+                                     IsEnabled="False" Margin="0,3,0,5"/>
+
+                            <Button Grid.Row="3" Grid.Column="1" Content="Отправить запрос"
+                                    HorizontalAlignment="Left" Width="140"
+                                    Click="SendRequest_Click"/>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="1" Header="Ответ">
+                        <TextBox x:Name="TxtClientResponse"
+                                 IsReadOnly="True" TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 FontFamily="Consolas" FontSize="11"
+                                 Margin="5"/>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Сообщения (POST)">
+                <Grid Margin="10">
+                    <GroupBox Header="Полученные POST-сообщения">
+                        <ListView x:Name="MessagesListView" Margin="5">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="ID" Width="60"
+                                                    DisplayMemberBinding="{Binding Id}"/>
+                                    <GridViewColumn Header="Сообщение" Width="400"
+                                                    DisplayMemberBinding="{Binding Message}"/>
+                                    <GridViewColumn Header="Время" Width="150"
+                                                    DisplayMemberBinding="{Binding Time}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>
